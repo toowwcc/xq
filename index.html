@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国象棋</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>中国象棋</h1>
+            <div class="game-info">
+                <div class="current-player">
+                    当前玩家: <span id="current-player">红方</span>
+                </div>
+                <div class="control-buttons">
+                    <button id="sound-btn" class="sound-btn">🔊 音效</button>
+                    <button id="check-warning-btn" class="check-warning-btn">⚠️ 将军提示</button>
+                    <button id="restart-btn" class="restart-btn">重新开始</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="board-container">
+            <div class="player-info red-player">
+                <h3>红方</h3>
+                <div class="captured-pieces" id="red-captured"></div>
+            </div>
+            
+            <div class="chess-board" id="chess-board">
+                <!-- 棋盘将通过JavaScript动态生成 -->
+            </div>
+            
+            <div class="player-info black-player">
+                <h3>黑方</h3>
+                <div class="captured-pieces" id="black-captured"></div>
+            </div>
+        </div>
+        
+        <div class="game-status">
+            <div id="game-message">游戏开始，红方先行</div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
