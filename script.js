@@ -4,7 +4,26 @@ class SoundManager {
         this.audioContext = null;
         this.sounds = {};
         this.enabled = true;
+        this.volume = 0.2; // 默认音量20%
         this.initAudioContext();
+    }
+
+    get isEnabled() {
+        return this.enabled;
+    }
+
+    get currentVolume() {
+        return this.volume;
+    }
+
+    setVolume(volume) {
+        // volume 范围 0-1
+        this.volume = Math.max(0, Math.min(1, volume));
+        if (this.volume === 0) {
+            this.enabled = false;
+        } else if (!this.enabled && this.volume > 0) {
+            this.enabled = true;
+        }
     }
 
     initAudioContext() {
@@ -30,8 +49,8 @@ class SoundManager {
         oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
         oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.1);
         
-        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0.3 * this.volume, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01 * this.volume, this.audioContext.currentTime + 0.2);
         
         oscillator.type = 'triangle';
         oscillator.start(this.audioContext.currentTime);
@@ -52,8 +71,8 @@ class SoundManager {
         oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
         oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.15);
         
-        gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.25);
+        gainNode.gain.setValueAtTime(0.4 * this.volume, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01 * this.volume, this.audioContext.currentTime + 0.25);
         
         oscillator.type = 'sawtooth';
         oscillator.start(this.audioContext.currentTime);
@@ -87,8 +106,8 @@ class SoundManager {
                 oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
                 oscillator.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.1);
                 
-                gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+                gainNode.gain.setValueAtTime(0.4 * this.volume, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01 * this.volume, this.audioContext.currentTime + 0.15);
                 
                 oscillator.type = 'sine';
                 oscillator.start(this.audioContext.currentTime);
@@ -239,11 +258,32 @@ class ChineseChess {
         const restartBtn = document.getElementById('restart-btn');
         restartBtn.addEventListener('click', () => this.restartGame());
         
-        const soundBtn = document.getElementById('sound-btn');
-        soundBtn.addEventListener('click', () => this.toggleSound());
+        const settingsBtn = document.getElementById('settings-btn');
+        settingsBtn.addEventListener('click', () => this.openSettings());
         
-        const checkWarningBtn = document.getElementById('check-warning-btn');
-        checkWarningBtn.addEventListener('click', () => this.toggleCheckWarning());
+        const closeSettingsBtn = document.getElementById('close-settings');
+        closeSettingsBtn.addEventListener('click', () => this.closeSettings());
+        
+        const soundToggle = document.getElementById('sound-toggle');
+        soundToggle.addEventListener('click', () => this.toggleSound());
+        
+        const checkWarningToggle = document.getElementById('check-warning-toggle');
+        checkWarningToggle.addEventListener('click', () => this.toggleCheckWarning());
+        
+        // 音量控制事件
+        const volumeIcon = document.getElementById('volume-icon');
+        volumeIcon.addEventListener('click', () => this.toggleVolumeIcon());
+        
+        const volumeSlider = document.getElementById('volume-slider');
+        volumeSlider.addEventListener('input', (e) => this.updateVolume(e.target.value));
+        
+        // 点击面板外部关闭设置
+        const settingsPanel = document.getElementById('settings-panel');
+        settingsPanel.addEventListener('click', (e) => {
+            if (e.target === settingsPanel) {
+                this.closeSettings();
+            }
+        });
     }
 
     // 处理棋盘点击
@@ -740,32 +780,96 @@ class ChineseChess {
         }, 3000);
     }
 
+    // 打开设置面板
+    openSettings() {
+        const settingsPanel = document.getElementById('settings-panel');
+        settingsPanel.style.display = 'flex';
+        this.updateSettingsDisplay();
+    }
+
+    // 关闭设置面板
+    closeSettings() {
+        const settingsPanel = document.getElementById('settings-panel');
+        settingsPanel.style.display = 'none';
+    }
+
+    // 更新设置显示
+    updateSettingsDisplay() {
+        const soundToggle = document.getElementById('sound-toggle');
+        const checkWarningToggle = document.getElementById('check-warning-toggle');
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeValue = document.getElementById('volume-value');
+        const volumeIcon = document.getElementById('volume-icon');
+        
+        // 更新音效按钮
+        if (this.soundManager.isEnabled) {
+            soundToggle.textContent = '🔊 开启';
+            soundToggle.className = 'toggle-btn sound-on';
+        } else {
+            soundToggle.textContent = '🔇 关闭';
+            soundToggle.className = 'toggle-btn sound-off';
+        }
+        
+        // 更新音量控制
+        const volumePercent = Math.round(this.soundManager.currentVolume * 100);
+        volumeSlider.value = volumePercent;
+        volumeValue.textContent = volumePercent + '%';
+        
+        // 更新音量图标
+        if (volumePercent === 0) {
+            volumeIcon.textContent = '🔇';
+        } else if (volumePercent < 30) {
+            volumeIcon.textContent = '🔉';
+        } else {
+            volumeIcon.textContent = '🔊';
+        }
+        
+        // 更新将军提示按钮
+        if (this.settings.checkWarning) {
+            checkWarningToggle.textContent = '⚠️ 开启';
+            checkWarningToggle.className = 'toggle-btn warning-on';
+        } else {
+            checkWarningToggle.textContent = '⚠️ 关闭';
+            checkWarningToggle.className = 'toggle-btn warning-off';
+        }
+    }
+
     // 切换音效
     toggleSound() {
-        const isEnabled = this.soundManager.toggleSound();
-        const soundBtn = document.getElementById('sound-btn');
-        
-        if (isEnabled) {
-            soundBtn.textContent = '🔊 音效';
-            soundBtn.classList.remove('muted');
+        if (this.soundManager.isEnabled) {
+            // 当前开启，设为静音
+            this.soundManager.setVolume(0);
         } else {
-            soundBtn.textContent = '🔇 静音';
-            soundBtn.classList.add('muted');
+            // 当前关闭，恢复到20%
+            this.soundManager.setVolume(0.2);
         }
+        this.updateSettingsDisplay();
     }
 
     // 切换将军提示
     toggleCheckWarning() {
         this.settings.checkWarning = !this.settings.checkWarning;
-        const checkBtn = document.getElementById('check-warning-btn');
-        
-        if (this.settings.checkWarning) {
-            checkBtn.textContent = '⚠️ 将军提示';
-            checkBtn.classList.remove('disabled');
+        this.updateSettingsDisplay();
+    }
+
+    // 点击音量图标切换静音/恢复
+    toggleVolumeIcon() {
+        const currentVolume = this.soundManager.currentVolume;
+        if (currentVolume === 0) {
+            // 当前静音，恢复到20%
+            this.soundManager.setVolume(0.2);
         } else {
-            checkBtn.textContent = '⚠️ 将军提示(关)';
-            checkBtn.classList.add('disabled');
+            // 当前有声音，设为静音
+            this.soundManager.setVolume(0);
         }
+        this.updateSettingsDisplay();
+    }
+
+    // 更新音量
+    updateVolume(value) {
+        const volume = parseInt(value) / 100;
+        this.soundManager.setVolume(volume);
+        this.updateSettingsDisplay();
     }
 }
 

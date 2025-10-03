@@ -15,8 +15,7 @@
                     当前玩家: <span id="current-player">红方</span>
                 </div>
                 <div class="control-buttons">
-                    <button id="sound-btn" class="sound-btn">🔊 音效</button>
-                    <button id="check-warning-btn" class="check-warning-btn">⚠️ 将军提示</button>
+                    <button id="settings-btn" class="settings-btn">⚙️ 设置</button>
                     <button id="restart-btn" class="restart-btn">重新开始</button>
                 </div>
             </div>
@@ -40,6 +39,36 @@
         
         <div class="game-status">
             <div id="game-message">游戏开始，红方先行</div>
+        </div>
+        
+        <!-- 设置面板 -->
+        <div id="settings-panel" class="settings-panel">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h3>游戏设置</h3>
+                    <button id="close-settings" class="close-btn">×</button>
+                </div>
+                <div class="settings-body">
+                    <div class="setting-item">
+                        <label>音效设置</label>
+                        <button id="sound-toggle" class="toggle-btn">🔊 开启</button>
+                    </div>
+                    <div class="setting-item">
+                        <label>音量控制</label>
+                        <div class="volume-control">
+                            <button id="volume-icon" class="volume-icon">🔊</button>
+                            <div class="volume-slider-container">
+                                <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="20">
+                                <span id="volume-value" class="volume-value">20%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label>将军提示</label>
+                        <button id="check-warning-toggle" class="toggle-btn">⚠️ 开启</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
